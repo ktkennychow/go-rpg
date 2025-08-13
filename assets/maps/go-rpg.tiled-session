@@ -1,0 +1,18 @@
+{
+    "activeFile": "",
+    "expandedProjectPaths": [
+    ],
+    "fileStates": {
+        "tilesets/buildings.json": {
+            "dynamicWrapping": true
+        },
+        "tilesets/tileset_floor.json": {
+            "dynamicWrapping": false
+        }
+    },
+    "openFiles": [
+    ],
+    "project": "go-rpg.tiled-project",
+    "recentFiles": [
+    ]
+}
