@@ -8,8 +8,8 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/ktkennychow/go-rpg/assets"
 	"github.com/ktkennychow/go-rpg/constants"
-	"github.com/ktkennychow/go-rpg/utils"
 )
 
 type Tileset interface {
@@ -60,7 +60,7 @@ func (dT *DynamicTileset) Img(id int) *ebiten.Image {
 }
 
 func NewTilesetFromPath(filepath string, gid int) (Tileset, error) {
-	f, err := utils.LoadFile(filepath)
+	f, err := assets.LoadFile(filepath)
 	if err != nil {
 		return nil, err
 	}

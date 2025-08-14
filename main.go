@@ -8,8 +8,8 @@ import (
 	"math/rand"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
+	"github.com/ktkennychow/go-rpg/assets"
 	"github.com/ktkennychow/go-rpg/constants"
 	"github.com/ktkennychow/go-rpg/entities"
 	"github.com/ktkennychow/go-rpg/maps"
@@ -117,11 +117,9 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 	return outsideWidth, outsideHeight
 }
 
+var playerImg = assets.MustLoadImage("Actor/Characters/FighterRed/SpriteSheet.png")
+
 func (g *Game) SpawnPlayer() {
-	playerImg, _, err := ebitenutil.NewImageFromFile("assets/Actor/Characters/FighterRed/SpriteSheet.png")
-	if err != nil {
-		log.Fatal(err)
-	}
 	g.player = &entities.Player{
 		Sprite: &entities.Sprite{
 			Img: playerImg.SubImage(image.Rect(0, 0, constants.TileSize, constants.TileSize)).(*ebiten.Image),
@@ -132,11 +130,9 @@ func (g *Game) SpawnPlayer() {
 	}
 }
 
+var potionImg = assets.MustLoadImage("Items/Potion/LifePot.png")
+
 func (g *Game) SpawnPotion() {
-	potionImg, _, err := ebitenutil.NewImageFromFile("assets/Items/Potion/LifePot.png")
-	if err != nil {
-		log.Fatal(err)
-	}
 	newPotion := &entities.Potion{
 		Sprite: &entities.Sprite{
 			Img: potionImg,
@@ -152,11 +148,9 @@ func (g *Game) SpawnPotion() {
 	})
 }
 
+var skeletonImg = assets.MustLoadImage("Actor/Characters/Skeleton/SpriteSheet.png")
+
 func (g *Game) SpawnEnemy() {
-	skeletonImg, _, err := ebitenutil.NewImageFromFile("assets/Actor/Characters/Skeleton/SpriteSheet.png")
-	if err != nil {
-		log.Fatal(err)
-	}
 	newEnemy := &entities.Enemy{
 		Sprite: &entities.Sprite{
 			Img: skeletonImg.SubImage(image.Rect(0, 0, constants.TileSize, constants.TileSize)).(*ebiten.Image),
@@ -172,17 +166,14 @@ func (g *Game) SpawnEnemy() {
 	})
 }
 
+var tilemapImg = assets.MustLoadImage("Backgrounds/Tilesets/TilesetFloor.png")
+
 func main() {
 	ebiten.SetWindowSize(constants.ScreenWidth, constants.ScreenHeight)
 	ebiten.SetWindowTitle("Hello, World!")
 	// ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 
-	tilemapImg, _, err := ebitenutil.NewImageFromFile("assets/Backgrounds/Tilesets/TilesetFloor.png")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	tilemapJSON, err := maps.NewTilemapJSON("assets/maps/spawn_map.json")
+	tilemapJSON, err := maps.NewTilemapJSON("maps/spawn_map.json")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -206,9 +197,13 @@ func main() {
 	game.SpawnEnemy()
 	game.SpawnEnemy()
 	game.SpawnEnemy()
+	game.SpawnEnemy()
+	game.SpawnEnemy()
+	game.SpawnEnemy()
+	game.SpawnEnemy()
 
 	if err := ebiten.RunGame(&game); err != nil {
 		log.Fatal(err)
 	}
-  select {}
+	select {}
 }

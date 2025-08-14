@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"path"
 
-	"github.com/ktkennychow/go-rpg/utils"
+	"github.com/ktkennychow/go-rpg/assets"
 )
 
 type TilemapLayerJSON struct {
@@ -24,7 +24,7 @@ type TilemapJSON struct {
 func (t *TilemapJSON) GetTilesets() ([]Tileset, error) {
 	tileSets := make([]Tileset, len(t.Tilesets))
 	for i, tileset := range t.Tilesets {
-		tilesetPath := path.Join("assets/maps/", tileset.Source)
+		tilesetPath := path.Join("maps/", tileset.Source)
 		tileSet, err := NewTilesetFromPath(tilesetPath, tileset.FirstGid)
 		if err != nil {
 			return nil, err
@@ -36,7 +36,7 @@ func (t *TilemapJSON) GetTilesets() ([]Tileset, error) {
 }
 
 func NewTilemapJSON(filepath string) (*TilemapJSON, error) {
-	jsonFile, err := utils.LoadFile(filepath)
+	jsonFile, err := assets.LoadFile(filepath)
 	if err != nil {
 		return nil, err
 	}
