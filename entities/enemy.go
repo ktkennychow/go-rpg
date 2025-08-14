@@ -1,10 +1,7 @@
 package entities
 
 import (
-	"image/color"
-
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/vector"
 	"github.com/ktkennychow/go-rpg/constants"
 	"github.com/ktkennychow/go-rpg/utils"
 )
@@ -36,7 +33,4 @@ func (e *Enemy) Draw(screen *ebiten.Image, cam *utils.Camera) {
 	opts.GeoM.Translate(cam.OffsetX, cam.OffsetY)
 	screen.DrawImage(e.Img, &opts)
 	opts.GeoM.Reset()
-
-	enemyRect := e.Collider()
-	vector.StrokeRect(screen, float32(enemyRect.X+cam.OffsetX), float32(enemyRect.Y+cam.OffsetY), float32(enemyRect.W), float32(enemyRect.H), 1, color.RGBA{255, 0, 0, 255}, true)
 }
