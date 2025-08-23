@@ -37,15 +37,26 @@ func (g *Game) Update() error {
 	}
 
 	for i, potion := range g.potions {
-		if g.colliders[i].Rect.Overlaps(image.Rect(int(g.player.X), int(g.player.Y), int(g.player.X+constants.TileSize), int(g.player.Y+constants.TileSize))) {
+		if potion.Sprite.Collider.Rect.Overlaps(image.Rect(int(g.player.X), int(g.player.Y), int(g.player.X+constants.TileSize), int(g.player.Y+constants.TileSize))) {
 			g.player.Health += potion.AmtHeal
 			g.potions = append(g.potions[:i], g.potions[i+1:]...)
-			g.colliders = append(g.colliders[:i], g.colliders[i+1:]...)
 			fmt.Printf("Potion collected: %d\n", g.player.Health)
+		}
+	}
+	for i, enemy := range g.enemies {
+		if enemy.Sprite.Collider.Rect.Overlaps(image.Rect(int(g.player.X), int(g.player.Y), int(g.player.X+constants.TileSize), int(g.player.Y+constants.TileSize))) {
+			g.player.Health -= 1
+			g.player.X += 10
+			g.enemies = append(g.enemies[:i], g.enemies[i+1:]...)
+			fmt.Printf("Enemy hit: %d\n", g.player.Health)
 		}
 	}
 	// global collider update
 	for i := range g.colliders {
+		// remove the collider if the owner is nil
+		if g.colliders[i].Owner == nil {
+			g.colliders = append(g.colliders[:i], g.colliders[i+1:]...)
+		}
 		// update the collider's position to the owner's position
 		g.colliders[i].Rect = image.Rect(int(g.colliders[i].Owner.X), int(g.colliders[i].Owner.Y), int(g.colliders[i].Owner.X+float64(g.colliders[i].Owner.Img.Bounds().Dx())), int(g.colliders[i].Owner.Y+float64(g.colliders[i].Owner.Img.Bounds().Dy())))
 	}
@@ -80,12 +91,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			opts.GeoM.Translate(g.cam.OffsetX, g.cam.OffsetY)
 			screen.DrawImage(img, &opts)
 			opts.GeoM.Reset()
-
-			// srcX := (tileid-1)%22*constants.TileSize + 1
-			// //int division loses decimal precision = flooring
-			// srcY := (tileid-1)/22*constants.TileSize + 1
-			// screen.DrawImage(g.tilemapImg.SubImage(image.Rect(srcX, srcY, srcX+constants.TileSize, srcY+constants.TileSize)).(*ebiten.Image), &opts)
-			// opts.GeoM.Reset()
 		}
 	}
 
@@ -120,7 +125,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 var playerImg = assets.MustLoadImage("Actor/Characters/FighterRed/SpriteSheet.png")
 
 func (g *Game) SpawnPlayer() {
-	g.player = &entities.Player{
+	newPlayer := &entities.Player{
 		Sprite: &entities.Sprite{
 			Img: playerImg.SubImage(image.Rect(0, 0, constants.TileSize, constants.TileSize)).(*ebiten.Image),
 			X:   constants.ScreenWidth/2 - constants.TileSize/2,
@@ -128,6 +133,12 @@ func (g *Game) SpawnPlayer() {
 		},
 		Health: constants.PlayerStartingHealth,
 	}
+	g.player = newPlayer
+	newPlayer.Sprite.Collider = &entities.Collider{
+		Owner: newPlayer.Sprite,
+		Rect:  image.Rect(int(newPlayer.X), int(newPlayer.Y), int(newPlayer.X+float64(newPlayer.Sprite.Img.Bounds().Dx())), int(newPlayer.Y+float64(newPlayer.Sprite.Img.Bounds().Dy()))),
+	}
+	g.colliders = append(g.colliders, newPlayer.Sprite.Collider)
 }
 
 var potionImg = assets.MustLoadImage("Items/Potion/LifePot.png")
@@ -142,10 +153,11 @@ func (g *Game) SpawnPotion() {
 		AmtHeal: constants.PotionHealAmount,
 	}
 	g.potions = append(g.potions, newPotion)
-	g.colliders = append(g.colliders, &entities.Collider{
+	newPotion.Sprite.Collider = &entities.Collider{
 		Owner: newPotion.Sprite,
 		Rect:  image.Rect(int(newPotion.X), int(newPotion.Y), int(newPotion.X+float64(newPotion.Sprite.Img.Bounds().Dx())), int(newPotion.Y+float64(newPotion.Sprite.Img.Bounds().Dy()))),
-	})
+	}
+	g.colliders = append(g.colliders, newPotion.Sprite.Collider)
 }
 
 var skeletonImg = assets.MustLoadImage("Actor/Characters/Skeleton/SpriteSheet.png")
@@ -159,11 +171,13 @@ func (g *Game) SpawnEnemy() {
 		},
 		FollowsPlayer: true,
 	}
+	newEnemy.Sprite.Collider = &entities.Collider{
+		Owner:    newEnemy.Sprite,
+		Rect:     image.Rect(int(newEnemy.X), int(newEnemy.Y), int(newEnemy.X+float64(newEnemy.Sprite.Img.Bounds().Dx())), int(newEnemy.Y+float64(newEnemy.Sprite.Img.Bounds().Dy()))),
+		Blocking: true,
+	}
 	g.enemies = append(g.enemies, newEnemy)
-	g.colliders = append(g.colliders, &entities.Collider{
-		Owner: newEnemy.Sprite,
-		Rect:  image.Rect(int(newEnemy.X), int(newEnemy.Y), int(newEnemy.X+float64(newEnemy.Sprite.Img.Bounds().Dx())), int(newEnemy.Y+float64(newEnemy.Sprite.Img.Bounds().Dy()))),
-	})
+	g.colliders = append(g.colliders, newEnemy.Sprite.Collider)
 }
 
 var tilemapImg = assets.MustLoadImage("Backgrounds/Tilesets/TilesetFloor.png")

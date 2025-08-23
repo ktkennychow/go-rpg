@@ -12,15 +12,22 @@ type Player struct {
 }
 
 func (p *Player) Update() {
+	// reset velocity
+	p.VelocityX = 0
+	p.VelocityY = 0
+
 	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
-		p.X -= constants.PlayerSpeed
+		p.VelocityX = -constants.PlayerSpeed
 	} else if ebiten.IsKeyPressed(ebiten.KeyRight) {
-		p.X += constants.PlayerSpeed
+		p.VelocityX = constants.PlayerSpeed
 	} else if ebiten.IsKeyPressed(ebiten.KeyUp) {
-		p.Y -= constants.PlayerSpeed
+		p.VelocityY = -constants.PlayerSpeed
 	} else if ebiten.IsKeyPressed(ebiten.KeyDown) {
-		p.Y += constants.PlayerSpeed
+		p.VelocityY = constants.PlayerSpeed
 	}
+
+	p.X += p.VelocityX
+	p.Y += p.VelocityY
 }
 
 func (p *Player) Draw(screen *ebiten.Image, cam *utils.Camera) {

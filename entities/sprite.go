@@ -7,5 +7,6 @@ import (
 type Sprite struct {
 	Img  *ebiten.Image
 	X, Y float64
-  Collider *Collider
+	VelocityX, VelocityY float64
+	Collider             *Collider
 }

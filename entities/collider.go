@@ -5,4 +5,5 @@ import "image"
 type Collider struct {
 	Owner *Sprite
 	Rect  image.Rectangle
+	Blocking bool
 }
